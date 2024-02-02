@@ -6,7 +6,7 @@ namespace BuberDinner.Api.Controller
 {
     [ApiController]
     [Route("auth")]
-    public class AuthenticationController:ControllerBase
+    public class AuthenticationController : ControllerBase
     {
         private readonly IAuthenticationService _authenticationService;
 
@@ -18,20 +18,20 @@ namespace BuberDinner.Api.Controller
         [HttpPost("register")]
         public IActionResult Register(RegisterRequest request)
         {
-            var authResult=_authenticationService.Register(
+            var authResult = _authenticationService.Register(
                 request.FirstName, request.LastName, request.Email, request.Password);
 
-            var response=new AuthenticationResponse(
-                               authResult.Id, authResult.FirstName, authResult.LastName, authResult.Email, authResult.Token);
+            var response = new AuthenticationResponse(
+                               authResult.User.Id, authResult.User.Firstname, authResult.User.Lastname, authResult.User.Email, authResult.Token);
             return Ok(response);
         }
         [HttpPost("login")]
         public IActionResult Login(LoginRequest request)
         {
-            var authResult=_authenticationService.Login(request.Email, request.Password);
+            var authResult = _authenticationService.Login(request.Email, request.Password);
 
-            var response=new AuthenticationResponse(
-                                              authResult.Id, authResult.FirstName, authResult.LastName, authResult.Email, authResult.Token);
+            var response = new AuthenticationResponse(
+                                              authResult.User.Id, authResult.User.Firstname, authResult.User.Lastname, authResult.User.Email, authResult.Token);
             return Ok(response);
         }
     }

@@ -1,4 +1,7 @@
 ﻿using BuberDinner.Application.Common.Interface.Authentication;
+using BuberDinner.Application.Common.Interface.Services;
+using BuberDinner.Domain.Entities;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -12,19 +15,28 @@ namespace BuberDinner.Infrastructure.Authentication
 {
     public class JwtTokenGenerator : IJwtTokenGenerator
     {
-        public string GenerateToken(Guid userId, string firstname, string lastname)
+        private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly JwtSettings _jwtOptions;
+
+        public JwtTokenGenerator(IDateTimeProvider dateTimeProvider, IOptions<JwtSettings> jwtOptions)
         {
-            var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes("This is my secret which must be 256 bits long.")), SecurityAlgorithms.HmacSha256);
+            _dateTimeProvider = dateTimeProvider;
+            this._jwtOptions = jwtOptions.Value;
+        }
+
+        public string GenerateToken(User user)
+        {
+            var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Secret)), SecurityAlgorithms.HmacSha256);
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-                new Claim(JwtRegisteredClaimNames.GivenName, firstname),
-                new Claim(JwtRegisteredClaimNames.FamilyName, lastname),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.GivenName, user.Firstname),
+                new Claim(JwtRegisteredClaimNames.FamilyName, user.Lastname),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
             var securityToken=new JwtSecurityToken(
-                issuer: "BuberDinner", audience: "BuberDinner", claims: claims, expires: DateTime.UtcNow.AddHours(1), signingCredentials: signingCredentials);
+                issuer: _jwtOptions.Issuer, audience: _jwtOptions.Audience, claims: claims, expires: _dateTimeProvider.UtcNow.AddMinutes(_jwtOptions.ExpiryMinutes), signingCredentials: signingCredentials);
 
             return new JwtSecurityTokenHandler().WriteToken(securityToken);
         }
