@@ -1,11 +1,10 @@
-﻿using BuberDinner.Application.Common.Interface.Authentication;
+﻿using BuberDinner.Application.Common.Errors;
+using BuberDinner.Application.Common.Interface.Authentication;
 using BuberDinner.Application.Common.Interface.Persistence;
+using BuberDinner.Domain.Common.Errors;
 using BuberDinner.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ErrorOr;
+using FluentResults;
 
 namespace BuberDinner.Application.Services.Authentication
 {
@@ -20,12 +19,12 @@ namespace BuberDinner.Application.Services.Authentication
             _userRepository = userRepository;
         }
 
-        public AuthenticationResult Register(string firstname, string lastname, string email, string password)
+        public ErrorOr<AuthenticationResult> Register(string firstname, string lastname, string email, string password)
         {
             // 1. Check if the user already exists
             if (_userRepository.GetUserByEmail(email) is not null)
             {
-                throw new Exception("User with given email already exists");
+                return Errors.User.DuplicateEmail;
             }
 
             // 2. If not, create a new user(generate unique id) & Persistence to DB
@@ -46,18 +45,18 @@ namespace BuberDinner.Application.Services.Authentication
                 user, token);
         }
 
-        public AuthenticationResult Login(string email, string password)
+        public ErrorOr<AuthenticationResult> Login(string email, string password)
         {
             // 1. Check if the user exists
             if (_userRepository.GetUserByEmail(email) is not User user)
             {
-                throw new Exception("User with given email does not exist");
+                return Errors.Authentication.InvalidCredentials;
             }
 
             // 2. Validate the password is correct
             if (user.Password != password)
             {
-                throw new Exception("Invalid password");
+                return Errors.Authentication.InvalidCredentials;
             }
 
             // 3. Generate a token
