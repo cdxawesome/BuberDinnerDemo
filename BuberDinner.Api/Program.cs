@@ -1,3 +1,4 @@
+using BuberDinner.Api;
 using BuberDinner.Api.Common.Errors;
 using BuberDinner.Application;
 using BuberDinner.Infrastructure;
@@ -5,11 +6,14 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddApplication().AddInfrastructure(builder.Configuration);
-builder.Services.AddControllers();
+builder.Services
+    .AddApplication()
+    .AddInfrastructure(builder.Configuration)
+    .AddPresentation();
 
-// 用自己的ProblemDetailsFactory替换掉默认的
-builder.Services.AddSingleton<ProblemDetailsFactory, BuberDinnerProblemDetailsFactory>();
+
+builder.Services
+    .AddSingleton<ProblemDetailsFactory, BuberDinnerProblemDetailsFactory>();
 var app = builder.Build();
 
 
