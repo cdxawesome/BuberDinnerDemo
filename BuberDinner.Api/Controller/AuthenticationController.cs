@@ -35,7 +35,7 @@ namespace BuberDinner.Api.Controller
                 errors => Problem(errors));
         }
 
-       
+
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequest request)
@@ -51,7 +51,7 @@ namespace BuberDinner.Api.Controller
             }
 
             return authResult.Match(
-                result => Ok(_mapper.Map<AuthenticationResponse>(authResult)),
+                result => Ok(_mapper.Map<AuthenticationResponse>(result)),
                 errors => Problem(errors));
         }
     }

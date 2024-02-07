@@ -25,6 +25,7 @@ namespace BuberDinner.Application.Authentication.Command.Register
             // 1. Check if the user already exists
             if (_userRepository.GetUserByEmail(request.Email) is not null)
             {
+                // 返回自定义错误
                 return Errors.User.DuplicateEmail;
             }
 

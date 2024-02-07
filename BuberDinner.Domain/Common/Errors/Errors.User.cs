@@ -11,6 +11,7 @@ namespace BuberDinner.Domain.Common.Errors
     {
         public static class User
         {
+            // 这个是自定义的错误类型，可以手动抛出
             public static Error DuplicateEmail => Error.Conflict(
                 code: "User.DuplicateEmail",
                 description: "此邮件已存在");
