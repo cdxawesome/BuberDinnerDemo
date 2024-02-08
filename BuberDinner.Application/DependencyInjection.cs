@@ -14,9 +14,10 @@ namespace BuberDinner.Application
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             services.AddMediatR(typeof(DependencyInjection).Assembly);
-            services.AddScoped<
-                IPipelineBehavior<RegisterCommand, ErrorOr<AuthenticationResult>>,
-                ValidateRegisterCommandBehavior>();
+            // services.AddScoped<
+            //     IPipelineBehavior<RegisterCommand, ErrorOr<AuthenticationResult>>,
+            //     ValidateRegisterCommandBehavior>();
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
             // 将RegisterCommandValidator注册到DI容器中
             /*这种方式的DI，在每次添加了新的Validator时，都要写一次*/
