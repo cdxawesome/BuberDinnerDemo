@@ -10,6 +10,7 @@ namespace BuberDinner.Api.Controller
     {
         protected IActionResult Problem(List<Error> errors)
         {
+            // 如果所有的错误都是Validation错误，返回ValidationProblem
             if (errors.All(err => err.Type == ErrorType.Validation))
             {
                 var modelStateDictionary = new ModelStateDictionary();
