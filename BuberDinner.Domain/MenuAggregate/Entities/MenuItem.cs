@@ -1,7 +1,7 @@
 using BuberDinner.Domain.Common.Models;
 using BuberDinner.Domain.Menu.ValueObjects;
 
-namespace BuberDinner.Domain.Menu.Entities;
+namespace BuberDinner.Domain.MenuAggregate.Entities;
 
 
 public sealed class MenuItem : Entity<MenuItemId>
@@ -11,7 +11,7 @@ public sealed class MenuItem : Entity<MenuItemId>
 
     private MenuItem(MenuItemId menuItemId,
                     string name,
-                    string description) :base(menuItemId)
+                    string description) : base(menuItemId)
     {
         Name = name;
         Description = description;
