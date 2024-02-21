@@ -31,22 +31,29 @@ public sealed class Menu : AggregateRoot<MenuId>
                  string description,
                  HostId hostId,
                  DateTime createdDateTime,
-                 DateTime updatedDateTime) : base(menuId)
+                 DateTime updatedDateTime,
+                 List<MenuSection> sections
+                 ) : base(menuId)
     {
         Name = name;
         Description = description;
         HostId = hostId;
         CreatedDateTime = createdDateTime;
         UpdatedDateTime = updatedDateTime;
+        _sections=sections;
     }
 
-    public static Menu Create(string name, string description, HostId hostId)
+    public static Menu Create(string name,
+                              string description,
+                              HostId hostId,
+                              List<MenuSection> sections)
     {
         return new(MenuId.CreateUnique(),
                    name,
                    description,
                    hostId,
                    DateTime.UtcNow,
-                   DateTime.UtcNow);
+                   DateTime.UtcNow,
+                   sections);
     }
 }
