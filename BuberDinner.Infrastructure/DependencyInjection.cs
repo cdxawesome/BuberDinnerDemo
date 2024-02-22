@@ -20,8 +20,15 @@ namespace BuberDinner.Infrastructure
                 ConfigurationManager configuration)
         {
             services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+            services.AddAuth(configuration).AddPersistence();
+            return services;
+        }
+
+        public static IServiceCollection AddPersistence(
+            this IServiceCollection services)
+        {
+            services.AddScoped<IMenuRepository, MenuRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddAuth(configuration);
             return services;
         }
 

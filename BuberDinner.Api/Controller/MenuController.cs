@@ -1,5 +1,6 @@
 using BuberDinner.Application.Menus.Commands.CreateMenu;
 using BuberDinner.Contracts.Menus;
+using BuberDinner.Domain.MenuAggregate;
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -22,8 +23,10 @@ public class MenuController : ApiController
     public async Task<IActionResult> CreateMenu(CreateMenuRequest request,
                                     string hostId)
     {
-        var command=_mapper.Map<CreateMenuCommand>((request,hostId));
-        var createMenuResult=await _mediator.Send(command);
-        return Ok(request);
+        var command = _mapper.Map<CreateMenuCommand>((request, hostId));
+        var createMenuResult = await _mediator.Send(command);
+
+        return createMenuResult.Match(menu => Ok(_mapper.Map<MenuResponse>(menu)),
+                                       errors => Problem(errors));
     }
 }
