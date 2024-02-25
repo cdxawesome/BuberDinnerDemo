@@ -1,6 +1,5 @@
 using BuberDinner.Domain.HostAggregate.ValueObjects;
 using BuberDinner.Domain.MenuAggregate;
-using BuberDinner.Domain.MenuAggregate.Entities;
 using BuberDinner.Domain.MenuAggregate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -13,6 +12,41 @@ public class MenuConfigurations : IEntityTypeConfiguration<Menu>
     {
         ConfigureMenusTable(builder);
         ConfigureMenuSectionsTable(builder);
+        ConfigureMenuDinnerIdsTable(builder);
+        ConfigureMenuReviewIdsTable(builder);
+    }
+
+    private void ConfigureMenuReviewIdsTable(EntityTypeBuilder<Menu> builder)
+    {
+         builder.OwnsMany(m => m.MenuReviewIds, mrb =>
+        {
+            mrb.ToTable("MenuReviewIds");
+            mrb.WithOwner().HasForeignKey("MenuId");
+            mrb.HasKey("Id");
+            mrb.Property(d=>d.Value)
+            .HasColumnName("ReviewId")
+            .ValueGeneratedNever();
+
+        });
+        builder.Metadata.FindNavigation(nameof(Menu.MenuReviewIds))!
+        .SetPropertyAccessMode(PropertyAccessMode.Field);
+
+    }
+
+    private void ConfigureMenuDinnerIdsTable(EntityTypeBuilder<Menu> builder)
+    {
+        builder.OwnsMany(m => m.DinnerIds, dib =>
+        {
+            dib.ToTable("MenuDinnerIds");
+            dib.WithOwner().HasForeignKey("MenuId");
+            dib.HasKey("Id");
+            dib.Property(d=>d.Value)
+            .HasColumnName("DinnerId")
+            .ValueGeneratedNever();
+
+        });
+        builder.Metadata.FindNavigation(nameof(Menu.DinnerIds))!
+        .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 
     private void ConfigureMenuSectionsTable(EntityTypeBuilder<Menu> builder)
@@ -25,40 +59,41 @@ public class MenuConfigurations : IEntityTypeConfiguration<Menu>
             section.WithOwner().HasForeignKey("MenuId");
 
             // 配置 MenuSection 的主键为一个联合主键，结合 MenuId 和 Id
-            section.HasKey(new[]{"Id","MenuId"});
+            section.HasKey(new[] { "Id", "MenuId" });
 
-            section.Property(s=>s.Id)
+            section.Property(s => s.Id)
             .HasColumnName("MenuSetionId")
             .ValueGeneratedNever()
             .HasConversion(
-                id=>id.Value,
-                value=>MenuSectionId.Create(value));
+                id => id.Value,
+                value => MenuSectionId.Create(value));
 
-            section.Property(s=>s.Name)
+            section.Property(s => s.Name)
             .HasMaxLength(100);
 
-            section.Property(s=>s.Description)
+            section.Property(s => s.Description)
             .HasMaxLength(100);
 
-            section.OwnsMany(s=>s.Items,ib=>{
+            section.OwnsMany(s => s.Items, ib =>
+            {
                 ib.ToTable("MenuItems");
-                ib.HasKey(nameof(MenuItem.Id),"MenuSectionId","MenuId");
-                ib.WithOwner().HasForeignKey("MenuSectionId","MenuId");
-                ib.Property(i=>i.Id)
+                ib.WithOwner().HasForeignKey("MenuSectionId", "MenuId");
+                ib.HasKey("Id", "MenuSectionId", "MenuId");
+                ib.Property(i => i.Id)
                 .HasColumnName("MenuItemId")
                 .ValueGeneratedNever()
                 .HasConversion(
-                    id=>id.Value,
-                    value=>MenuItemId.Create(value));
-                ib.Property(i=>i.Name)
+                    id => id.Value,
+                    value => MenuItemId.Create(value));
+                ib.Property(i => i.Name)
                 .HasMaxLength(100);
-                ib.Property(i=>i.Description)
+                ib.Property(i => i.Description)
                 .HasMaxLength(100);
 
             });
 
-            section.Navigation(s=>s.Items).Metadata.SetField("_items");
-            section.Navigation(s=>s.Items).Metadata.SetPropertyAccessMode(PropertyAccessMode.Field);
+            section.Navigation(s => s.Items).Metadata.SetField("_items");
+            section.Navigation(s => s.Items).Metadata.SetPropertyAccessMode(PropertyAccessMode.Field);
         });
         /*
         这里配置EFCore的导航访问模式权限。在Menu类中，Sections属性是一个只读的集合
