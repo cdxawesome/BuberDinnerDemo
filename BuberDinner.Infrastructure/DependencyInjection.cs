@@ -31,7 +31,7 @@ namespace BuberDinner.Infrastructure
         {
             services.AddScoped<IMenuRepository, MenuRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddDbContext<BuberDinnerDbContext>(options => options.UseSqlServer());
+            services.AddDbContext<BuberDinnerDbContext>(options => options.UseSqlServer("Server=localhost;Database=BuberDinner;User Id=sa;Password=admin123!;TrustServerCertificate=True;"));
             return services;
         }
 
